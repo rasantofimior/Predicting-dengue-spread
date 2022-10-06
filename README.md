@@ -1,4 +1,4 @@
-# Predicting-earthquakes
+# Predicting-dengue-spread
 Final project BDML 2022
 
 
