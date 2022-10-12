@@ -2,7 +2,7 @@
 Final project BDML 2022
 
 
-This is a repository for the Problem Set 1 from Big Data and Machine Learning for Applied Economics course at 2022 Fall. 
+This is a repository for the final project from Big Data and Machine Learning for Applied Economics course at 2022 Fall. 
 
 Thi repo contains the following folders:
 
