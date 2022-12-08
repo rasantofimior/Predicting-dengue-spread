@@ -1,3 +1,4 @@
+tictoc::tic("Lasso")
 source("../scripts/recipes.R")
 source("../scripts/workflows.R")
 source("../scripts/tuning.R")
@@ -11,6 +12,7 @@ result <- wf %>% tuning(
 )
 parallel::stopCluster(cl)
 
+cat("---------------------------\n---------- LASSO ----------\n---------------------------\n")
 result %>%
     collect_metrics() %>%
     arrange(mean) %>%
@@ -22,11 +24,11 @@ best <- select_best(result, metric = "mae")
 final_wf <- wf %>% finalize_workflow(best)
 
 # Check coefficients
-final_wf %>%
-    fit(validation) %>%
-    tidy() %>%
-    arrange(desc(estimate)) %>%
-    print(n = Inf)
+# final_wf %>%
+#     fit(validation) %>%
+#     tidy() %>%
+#     arrange(desc(estimate)) %>%
+#     print(n = Inf)
 
 # Save workflow
 saveRDS(final_wf, "../stores/bestwf_lasso.Rds")
@@ -34,23 +36,4 @@ saveRDS(final_wf, "../stores/bestwf_lasso.Rds")
 # Save result
 saveRDS(result, "../stores/result_lasso.Rds")
 
-# # Fit on training, predict on test, and report performance
-# lf <- last_fit(final_wf, data_split)
-# # Performance metric on test set
-# metric <- rmse(
-#     data.frame(
-#         test["Ingpcug"],
-#         lf %>% extract_workflow() %>% predict(test)
-#     ),
-#     Ingpcug,
-#     .pred
-# )$.estimate
-
-# # Final report for this model
-# report <- data.frame(
-#     Problema = "Reg.", Modelo = "Lasso",
-#     Penalidad = "0.00055", Mixtura = "1",
-#     result %>% show_best(n = 1) %>% mutate(mean = metric)
-# )
-
-# saveRDS(report, file = "../stores/lasso_reg.rds")
+tictoc::toc()

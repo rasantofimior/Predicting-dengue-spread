@@ -1,3 +1,4 @@
+tictoc::tic("Neural Network")
 source("../scripts/recipes.R")
 source("../scripts/workflows.R")
 source("../scripts/tuning.R")
@@ -9,6 +10,7 @@ result <- wf %>% tuning(
     model = "mlp"
 )
 parallel::stopCluster(cl)
+cat("-------------------------\n---------- MLP ----------\n-------------------------\n")
 result %>%
     collect_metrics() %>%
     arrange(mean) %>%
@@ -20,35 +22,10 @@ best <- select_best(result, metric = "mae")
 final_wf <- wf %>% finalize_workflow(best)
 
 
-# Check coefficients
-final_wf %>%
-    fit(validation) %>%
-    tidy() %>%
-    print(n = Inf)
-
 # Save workflow
 saveRDS(final_wf, "../stores/bestwf_mlp.Rds")
 
 # Save result
 saveRDS(result, "../stores/result_mlp.Rds")
 
-# # Fit on training, predict on test, and report performance
-# lf <- last_fit(final_wf, data_split)
-# # Performance metric on test set
-# metric <- rmse(
-#     data.frame(
-#         test["Ingpcug"],
-#         lf %>% extract_workflow() %>% predict(test)
-#     ),
-#     Ingpcug,
-#     .pred
-# )$.estimate
-
-# # Final report for this model
-# report <- data.frame(
-#     Problema = "Reg.", Modelo = "Lineal",
-#     Penalidad = "N/A", Mixtura = "N/A",
-#     result %>% show_best(n = 1) %>% mutate(mean = metric)
-# )
-
-# saveRDS(report, file = "../stores/lm_reg.rds")
+tictoc::toc()

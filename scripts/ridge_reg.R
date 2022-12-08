@@ -1,3 +1,4 @@
+tictoc::tic("Ridge")
 source("../scripts/recipes.R")
 source("../scripts/workflows.R")
 source("../scripts/tuning.R")
@@ -10,7 +11,7 @@ result <- wf %>% tuning(
     model = "ridge"
 )
 parallel::stopCluster(cl)
-
+cat("---------------------------\n---------- RIDGE ----------\n---------------------------\n")
 result %>%
     collect_metrics() %>%
     arrange(mean) %>%
@@ -22,11 +23,11 @@ best <- select_best(result, metric = "mae")
 final_wf <- wf %>% finalize_workflow(best)
 
 # Check coefficients
-final_wf %>%
-    fit(validation) %>%
-    tidy() %>%
-    arrange(desc(estimate)) %>%
-    print(n = Inf)
+# final_wf %>%
+#     fit(train) %>%
+#     tidy() %>%
+#     arrange(desc(estimate)) %>%
+#     print(n = Inf)
 
 # Save workflow
 saveRDS(final_wf, "../stores/bestwf_ridge.Rds")
@@ -34,23 +35,4 @@ saveRDS(final_wf, "../stores/bestwf_ridge.Rds")
 # Save result
 saveRDS(result, "../stores/result_ridge.Rds")
 
-# # Fit on training, predict on test, and report performance
-# lf <- last_fit(final_wf, data_split)
-# # Performance metric on test set
-# metric <- rmse(
-#     data.frame(
-#         test["Ingpcug"],
-#         lf %>% extract_workflow() %>% predict(test)
-#     ),
-#     Ingpcug,
-#     .pred
-# )$.estimate
-
-# # Final report for this model
-# report <- data.frame(
-#     Problema = "Reg.", Modelo = "Ridge",
-#     Penalidad = "N/A", Mixtura = "0",
-#     result %>% show_best(n = 1) %>% mutate(mean = metric)
-# )
-
-# saveRDS(report, file = "../stores/ridge_reg.rds")
+tictoc::toc()
