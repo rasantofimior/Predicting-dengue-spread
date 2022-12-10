@@ -67,11 +67,11 @@ ui <- fluidPage(
   fluidRow(column(1, tags$img(src = 'mosco.png',
                               width = '120px', 
                               height = '70px')),
-           column(8, h1(strong('Big Data and ML Dashboard')))),
+           column(8, h1(strong('Forcast & ML Dashboard')))),
   
   
   # Título de la página
-  headerPanel('Predicting Dengue Spread'),
+  headerPanel('Predicting Dengue Spread in San Juan & Iquitos'),
   
   sidebarLayout(
     sidebarPanel(
@@ -104,8 +104,9 @@ ui <- fluidPage(
     #), # Close div() function
     
     ###### Reset button ######
-    actionButton('resetAll', 
-                 label = 'Click to Reset Options'),
+    submitButton('Apply Changes'),
+    #actionButton('resetAll', 
+    #             label = 'Click to Reset Options'),
     
     
     ###### Loading message appears ######
@@ -123,6 +124,17 @@ ui <- fluidPage(
   )# Close SideBarlayout
 )# Close fluidPage
 
+
+# p<- ggplot(data = total,aes(y = total_cases, x = week_start_date, color = ref)) +
+#   geom_line() +
+#   labs(
+#     x = "Fecha",
+#     y = "Casos Totales",
+#     title = "Casos Totales de Dengue Iquitos, Perú(95% IC)"
+# )
+#   
+
+
 server = function(input, output) {
   output$txtout <- renderText({
     paste(input$txt, input$slider, format(input$week_start_date), sep = ", ")
@@ -131,7 +143,7 @@ server = function(input, output) {
     head(cars, 4)
   })
   
-  output$mapa_grafico <-  renderImage({
+  output$mapa_grafico =  renderImage({
     ## Map graph
     if (input$city_selected == 'iq') {
       img(
@@ -158,25 +170,27 @@ server = function(input, output) {
   # By city
   if (input$city_selected == 'iq') {
     graph = reactive({
-      ggplot(data = total_iq, aes(x=week_start_date, y=total_cases, color = ref)) +
-        geom_area(fill="#69b3a2", alpha=0.5) +
-        geom_line(color="#69b3a2") +
-        ylab("Casos Totales de Dengue Iquitos, Perú(95% IC)") +
-        theme_ipsum()
+      ggplot(data = total_iq,aes(y = total_cases, x = week_start_date, color = ref)) +
+        geom_line() +
+        labs(
+          x = "Date",
+          y = "Total Cases Iquitos, Perú(95% IC)"
+        )
     })
   } # Close conditional clause
   # By sj
   else {
     graph = reactive({
-      ggplot(data = total_sj, aes(x=week_start_date, y=total_cases, color = ref)) +
-        geom_area(fill="#69b3a2", alpha=0.5) +
-        geom_line(color="#69b3a2") +
-        ylab("Casos Totales de Dengue San Juan, Puerto Rico(95% IC)") +
-        theme_ipsum()
+      ggplot(data = total_sj,aes(y = total_cases, x = week_start_date, color = ref)) +
+        geom_line() +
+        labs(
+          x = "Date",
+          y = "Total Cases San Juan, Puerto Rico(95% IC)"
+        )
     })
   } # Close else clause
 
-  ggplotly(graph()) %>% layout(title = list(text = 'Predition Total Dengue Cases'))
+  ggplotly(graph()) %>% layout(title = list(text = 'Prediction Dengue Cases'))
 
   }) # Close renderPlotly for residuals graph
 }
