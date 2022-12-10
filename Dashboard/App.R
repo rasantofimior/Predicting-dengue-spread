@@ -94,14 +94,14 @@ ui <- fluidPage(
                   value = "2013-06-25" 
                   ),
         #Options for calculations
-        div(id = 'all',
-        radioButtons('calculate',
-                     label = '4. Calculation',
-                     choices = c('No', 
-                                 'Calculate  Predictions'),
-                     selected = 'No'),
+       # div(id = 'all',
+        #radioButtons('calculate',
+        #             label = '4. Calculation',
+        #             choices = c('No', 
+        #                         'Calculate  Predictions'),
+        #             selected = 'No'),
         
-    ), # Close div() function
+    #), # Close div() function
     
     ###### Reset button ######
     actionButton('resetAll', 
@@ -133,7 +133,7 @@ server = function(input, output) {
   
   output$mapa_grafico <-  renderImage({
     ## Map graph
-    if (input$city_selected != 'iq') {
+    if (input$city_selected == 'iq') {
       img(
         src = "iquitos.png",
         alt = "Iquitos Map",
@@ -142,8 +142,8 @@ server = function(input, output) {
     }
     else {
       img(
-        src = "san_juan.png",
-        alt = "An Juan Map",
+        src = 'san_juan.png',
+        alt = "San Juan Map",
         width = 100, height = 100
       )
     }
@@ -153,12 +153,10 @@ server = function(input, output) {
     
   output$serie_grafico= renderPlotly({
   ## Serie graph
-
+    total_iq <- total %>% filter(city == 'iq'& week_start_date >= input$start_date & week_start_date <= input$end_date)
+    total_sj <- total %>% filter(city == 'sj'& week_start_date >= input$start_date & week_start_date <= input$end_date)
   # By city
-  if (input$city_selected != 'iq') {
-    total_iq <- subset(total,
-                       city = "iq" & week_start_date >= input$start_date & week_start_date <= input$end_date,
-                       select = c(total_cases,week_start_date,ref))
+  if (input$city_selected == 'iq') {
     graph = reactive({
       ggplot(data = total_iq, aes(x=week_start_date, y=total_cases, color = ref)) +
         geom_area(fill="#69b3a2", alpha=0.5) +
@@ -169,9 +167,6 @@ server = function(input, output) {
   } # Close conditional clause
   # By sj
   else {
-    total_sj <- subset(total,
-                       city = "sj" & week_start_date >= input$start_date & week_start_date <= input$end_date,
-                       select = c(total_cases,week_start_date,ref))
     graph = reactive({
       ggplot(data = total_sj, aes(x=week_start_date, y=total_cases, color = ref)) +
         geom_area(fill="#69b3a2", alpha=0.5) +
