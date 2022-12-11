@@ -20,6 +20,26 @@ final_pred <- predict(final_st, df_final_test) %>%
 
 #k <- final_pred %>% group_by(city, year, weekofyear) %>% summarise_each(funs(mean, sd))
 
+sample.mean <- mean(final_pred$total_cases)
+sample.n <- length(final_pred$total_cases)
+sample.sd <- sd(final_pred$total_cases)
+sample.se <- sample.sd/sqrt(sample.n)
+
+alpha = 0.05
+degrees.freedom = sample.n - 1
+t.score = qt(p=alpha/2, df=degrees.freedom,lower.tail=F)
+margin.error <- t.score * sample.se
+lower.bound <- sample.mean - margin.error
+upper.bound <- sample.mean + margin.error
+print(c(lower.bound,upper.bound))
+
+final_pred$media <- mean(final_pred$total_cases)
+final_pred$sd <- sd(final_pred$total_cases)
+final_pred$lower_bound <- final_pred$total_cases - margin.error
+final_pred$upper_bound <- final_pred$total_cases + margin.error
+
+
+
 
 form <- read_csv("../stores/dengue_features_test.csv")
 form <- form %>% mutate(weekofyear = as.factor(weekofyear))
