@@ -18,26 +18,20 @@ final_pred <- predict(final_st, df_final_test) %>%
   select(.pred, city, year, weekofyear) %>%
   rename(total_cases = .pred) 
 
-#k <- final_pred %>% group_by(city, year, weekofyear) %>% summarise_each(funs(mean, sd))
 
-sample.mean <- mean(final_pred$total_cases)
-sample.n <- length(final_pred$total_cases)
-sample.sd <- sd(final_pred$total_cases)
-sample.se <- sample.sd/sqrt(sample.n)
+
+ df_confidence <- final_pred %>%  group_by(city, year) %>% 
+  summarise(mean = mean(total_cases), sample.n = length(total_cases), sample.sd = sd(total_cases))
+ df_confidence$sample.se <-  (df_confidence$sample.sd/sqrt(df_confidence$sample.n))
 
 alpha = 0.05
-degrees.freedom = sample.n - 1
-t.score = qt(p=alpha/2, df=degrees.freedom,lower.tail=F)
-margin.error <- t.score * sample.se
-lower.bound <- sample.mean - margin.error
-upper.bound <- sample.mean + margin.error
+df_confidence$degrees.freedom =  df_confidence$sample.n - 1
+df_confidence$t.score = qt(p=alpha/2, df= df_confidence$degrees.freedom,lower.tail=F)
+df_confidence$margin.error <-  df_confidence$t.score *  df_confidence$sample.se
+df_confidence$lower.bound <-  df_confidence$mean -  df_confidence$margin.error
+df_confidence$upper.bound <-  df_confidence$mean +  df_confidence$margin.error
 print(c(lower.bound,upper.bound))
-
-final_pred$media <- mean(final_pred$total_cases)
-final_pred$sd <- sd(final_pred$total_cases)
-final_pred$lower_bound <- final_pred$total_cases - margin.error
-final_pred$upper_bound <- final_pred$total_cases + margin.error
-
+write.csv(df_confidence, "../stores/df_confidence_group.csv", row.names = FALSE)
 
 
 
