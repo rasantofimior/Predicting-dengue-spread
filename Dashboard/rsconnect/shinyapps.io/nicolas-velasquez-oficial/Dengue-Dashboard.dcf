@@ -1,0 +1,13 @@
+name: Dengue-Dashboard
+title: Dengue-Dashboard
+username:
+account: nicolas-velasquez-oficial
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7875173
+bundleId: 6628693
+url: https://nicolas-velasquez-oficial.shinyapps.io/Dengue-Dashboard/
+when: 1670876342.83597
+lastSyncTime: 1670876342.83599
+asMultiple: FALSE
+asStatic: FALSE

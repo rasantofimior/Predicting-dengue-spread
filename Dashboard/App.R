@@ -13,6 +13,7 @@
 #================#
 #### Paquetes ####
 #================#
+
 rm(list = ls())
 
 library(shiny)       # Para poder hacer la aplicación
@@ -29,32 +30,36 @@ library(hrbrthemes)
 library(dygraphs)
 library(xts)          # To make the convertion data-frame / xts format
 library(lubridate)
+library(recolorize)
+
 #=================#
 #### Preámbulo ####
 #=================#
-setwd(r'(C:\Users\juan.velasquez\OneDrive - Universidad de los Andes\Maestria\Semestres\2022-2\BIG DATA & MACHINE LEARNING FOR APPLIED ECONOMICS\Trabajo\Predicting-dengue-spread\Dashboard)')
+#setwd(r'(C:\Users\juan.velasquez\OneDrive - Universidad de los Andes\Maestria\Semestres\2022-2\BIG DATA & MACHINE LEARNING FOR APPLIED ECONOMICS\Trabajo\Predicting-dengue-spread\Dashboard)')
 
-#Cargar los datos OJO->(cambiar predictions por el real)
-dengue_labels_test = read.csv("stores/test_format.csv")
+#Cargar los datos 
+dengue_labels_test = read.csv("stores/predictions.csv")
 dengue_features_test = read.csv("stores/dengue_features_test.csv")
 dengue_labels_train = read.csv("stores/dengue_labels_train.csv")
 dengue_features_train = read.csv("stores/dengue_features_train.csv")
 # merge two data frames by ID and Country
 #Ojo el inicio y final de fechas para pred y train de IQ y SJ son distintos. El selector debe tener esto en cuenta. 
-total_pred <- merge(dengue_labels_test,dengue_features_test,by=c("city","year", "weekofyear"))
-total_pred$ref= "Prediction"
-total_train <- merge(dengue_labels_train,dengue_features_train,by=c("city","year", "weekofyear"))
-total_train$ref= "Real"
+total_pred <- merge(dengue_labels_test,dengue_features_test,by=c("city","year","weekofyear"))
+total_pred$data= "Prediction"
+total_train <- merge(dengue_labels_train,dengue_features_train,by=c("city","year","weekofyear"))
+total_train$data= "Real"
+total_train$lower.bound = total_train$total_cases
+total_train$upper.bound = total_train$total_cases
+total_train$margin = total_train$total_cases
 total<-rbind(total_train,total_pred)
 # Since my time is currently a factor, I have to convert it to a date-time format!
 total$week_start_date <- ymd(total$week_start_date)
-# Variables numéricas
-#total_num = total %>%
-#  select(where(is.numeric))
-# Variables Region and date
-#total_cat= total %>%
-#  select(where(is.character))
-
+#Cahnge SJ and IQ for real names
+total <-  total %>% dplyr::mutate(
+  city = dplyr::if_else(
+    city == "iq", "Iquitos", "San Juan"
+  )
+)
 #=================#
 #### Shiny App ####
 #=================#
@@ -64,14 +69,17 @@ ui <- fluidPage(
   theme = shinytheme('united'),
   
   # Encabezado
-  fluidRow(column(1, tags$img(src = 'mosco.png',
-                              width = '120px', 
-                              height = '70px')),
-           column(8, h1(strong('Forcast & ML Dashboard')))),
+  fluidRow( column(1, tags$img(src = 'mosco_plus.png',
+                               width = '80px', 
+                               height = '50px')),
+           column(8, h1(strong('Forcast Dashboard'))),
+           column(1, tags$img(src = 'Uniandes.png',
+                              width = '200px', 
+                              height = '90px'))),
   
   
   # Título de la página
-  headerPanel('Predicting Dengue Spread in San Juan & Iquitos'),
+  headerPanel('Predicting Dengue Spread using Machine Learning'),
   
   sidebarLayout(
     sidebarPanel(
@@ -114,26 +122,31 @@ ui <- fluidPage(
                      tags$div(id = 'loadmessage',
                               'Calculating...')
     ), # Close conditional panel for loading message
+    p("Designed and built by: Camilo Bonilla, Rafael Santofimio and Nicolás Velásquez.")
     ),# Close SidebarPanel  depende del selector de la ciudad
-    mainPanel(
-      splitLayout(
-        plotlyOutput('mapa_grafico'),
-        plotlyOutput('serie_grafico')
-      )
+    mainPanel( 
+        plotlyOutput('serie_grafico'),
+        p("Note: For the use of the forecast panel, 
+          choose a city between San Juan and Iquitos and a time period (start date and end date),finally click the button Apply Changes. 
+          These cities have different forecast breackpoints 09-07-2010 & 29-04-2008 respectively, 
+          so the graph will display it accordingly. Predictions are presented with 95% confidence interval.")
     )# Close MainPanel
   )# Close SideBarlayout
 )# Close fluidPage
 
 
-# p<- ggplot(data = total,aes(y = total_cases, x = week_start_date, color = ref)) +
-#   geom_line() +
+# data %>% ggplot(aes(y = predict_mod_peak_female$fit, x = age, color = female)) +
+#   geom_point() +
 #   labs(
-#     x = "Fecha",
-#     y = "Casos Totales",
-#     title = "Casos Totales de Dengue Iquitos, Perú(95% IC)"
-# )
-#   
-
+#     x = "Edad",
+#     y = "Log Salario mensual predicho",
+#     title = "log Salarios mensual vs. Edad (95% IC)"
+#   ) +
+#   geom_ribbon(
+#     aes(ymin = predict_mod_peak_female$lwr, ymax = predict_mod_peak_female$upr),
+#     alpha = 0.2
+#   )
+# 
 
 server = function(input, output) {
   output$txtout <- renderText({
@@ -143,49 +156,50 @@ server = function(input, output) {
     head(cars, 4)
   })
   
-  output$mapa_grafico =  renderImage({
-    ## Map graph
-    if (input$city_selected == 'iq') {
-      img(
-        src = "iquitos.png",
-        alt = "Iquitos Map",
-        width = 100, height = 100
-      )
-    }
-    else {
-      img(
-        src = 'san_juan.png',
-        alt = "San Juan Map",
-        width = 100, height = 100
-      )
-    }
-  },deleteFile=TRUE
-  )
-    
-    
+  # output$mapa_grafico =  renderImage(
+  #   ## Map graph
+  #   
+  #   if (input$city_selected == 'Iquitos') {
+  #     img <- readImage("www/iquitos.png", resize = NULL, rotate = NULL)
+  #     plotImageArray(img)
+  #   }
+  #   else {
+  #     img <- readImage("san_juan.png", resize = NULL, rotate = NULL)
+  #     plotImageArray(img)
+  #   } 
+  # )
+  #   
   output$serie_grafico= renderPlotly({
   ## Serie graph
-    total_iq <- total %>% filter(city == 'iq'& week_start_date >= input$start_date & week_start_date <= input$end_date)
-    total_sj <- total %>% filter(city == 'sj'& week_start_date >= input$start_date & week_start_date <= input$end_date)
+    total_iq <- total %>% filter(city == 'Iquitos'& week_start_date >= input$start_date & week_start_date <= input$end_date)
+    total_sj <- total %>% filter(city == 'San Juan'& week_start_date >= input$start_date & week_start_date <= input$end_date)
   # By city
-  if (input$city_selected == 'iq') {
+  if (input$city_selected == 'Iquitos') {
     graph = reactive({
-      ggplot(data = total_iq,aes(y = total_cases, x = week_start_date, color = ref)) +
+     ggplot(data = total_iq,aes(y = total_cases, x = week_start_date, color = data)) +
         geom_line() +
         labs(
-          x = "Date",
+          x = "Fecha",
           y = "Total Cases Iquitos, Perú(95% IC)"
+        ) +
+        geom_ribbon(
+          aes(ymin = lower.bound, ymax = upper.bound),
+          alpha = 0.2
         )
     })
   } # Close conditional clause
   # By sj
   else {
     graph = reactive({
-      ggplot(data = total_sj,aes(y = total_cases, x = week_start_date, color = ref)) +
+      ggplot(data = total_sj,aes(y = total_cases, x = week_start_date, color = data)) +
         geom_line() +
         labs(
-          x = "Date",
+          x = "Fecha",
           y = "Total Cases San Juan, Puerto Rico(95% IC)"
+        ) +
+        geom_ribbon(
+          aes(ymin = lower.bound, ymax = upper.bound),
+          alpha = 0.2
         )
     })
   } # Close else clause

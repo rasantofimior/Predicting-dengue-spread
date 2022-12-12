@@ -1,0 +1,37 @@
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+year & 1,872 & 2,003.195 & 6.292 & 1,990 & 2,013 \\ 
+weekofyear & 1,872 & 26.489 & 15.006 & 1 & 53 \\ 
+total\_cases & 1,872 & 24.805 & 39.536 & 0 & 461 \\ 
+ndvi\_ne & 1,635 & 0.139 & 0.146 & $-$0.463 & 0.508 \\ 
+ndvi\_nw & 1,809 & 0.130 & 0.125 & $-$0.456 & 0.649 \\ 
+ndvi\_se & 1,849 & 0.205 & 0.075 & $-$0.016 & 0.538 \\ 
+ndvi\_sw & 1,849 & 0.202 & 0.086 & $-$0.063 & 0.546 \\ 
+precipitation\_amt\_mm & 1,857 & 44.109 & 42.066 & 0.000 & 390.600 \\ 
+reanalysis\_air\_temp\_k & 1,860 & 298.728 & 1.387 & 294.554 & 302.200 \\ 
+reanalysis\_avg\_temp\_k & 1,860 & 299.254 & 1.273 & 294.893 & 303.329 \\ 
+reanalysis\_dew\_point\_temp\_k & 1,860 & 295.285 & 1.528 & 289.643 & 298.450 \\ 
+reanalysis\_max\_air\_temp\_k & 1,860 & 303.471 & 3.206 & 297.800 & 314.100 \\ 
+reanalysis\_min\_air\_temp\_k & 1,860 & 295.725 & 2.609 & 286.200 & 299.900 \\ 
+reanalysis\_precip\_amt\_kg\_per\_m2 & 1,860 & 40.601 & 44.705 & 0.000 & 570.500 \\ 
+reanalysis\_relative\_humidity\_percent & 1,860 & 82.237 & 7.204 & 57.787 & 98.610 \\ 
+reanalysis\_sat\_precip\_amt\_mm & 1,857 & 44.109 & 42.066 & 0.000 & 390.600 \\ 
+reanalysis\_specific\_humidity\_g\_per\_kg & 1,860 & 16.787 & 1.547 & 11.716 & 20.461 \\ 
+reanalysis\_tdtr\_k & 1,860 & 4.953 & 3.546 & 1.357 & 16.029 \\ 
+station\_avg\_temp\_c & 1,817 & 27.227 & 1.281 & 21.400 & 30.800 \\ 
+station\_diur\_temp\_rng\_c & 1,817 & 8.004 & 2.206 & 4.043 & 15.800 \\ 
+station\_max\_temp\_c & 1,849 & 32.471 & 1.950 & 26.700 & 42.200 \\ 
+station\_min\_temp\_c & 1,849 & 22.161 & 1.613 & 14.200 & 26.700 \\ 
+station\_precip\_mm & 1,845 & 38.202 & 44.961 & 0.000 & 543.300 \\ 
+lower.bound & 416 & 21.071 & 18.374 & $-$6.214 & 112.786 \\ 
+upper.bound & 416 & 29.448 & 21.149 & 1.043 & 143.214 \\ 
+margin & 416 & 4.188 & 3.034 & 1.043 & 15.214 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}

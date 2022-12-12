@@ -1,8 +1,6 @@
-
 rm(list = ls())
 setwd(r'(C:\Users\juan.velasquez\OneDrive - Universidad de los Andes\Maestria\Semestres\2022-2\BIG DATA & MACHINE LEARNING FOR APPLIED ECONOMICS\Trabajo\Predicting-dengue-spread\scripts)')
 #### **Instalar/llamar las librerías de la clase**
-
 require(pacman)
 p_load(
   tidyverse, rio, skimr, viridis, osmdata,
