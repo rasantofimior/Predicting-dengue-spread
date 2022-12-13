@@ -124,10 +124,10 @@ rec_caller <- function(data,
 }
 
 set.seed(10)
-validation_split <- vfold_cv(validation, v = 5)
+validation_split <- vfold_cv(train, v = 5)
 
 rec <- rec_caller(
-    validation,
+    train,
     interact = TRUE,
     poly = TRUE,
     percentage = TRUE,
